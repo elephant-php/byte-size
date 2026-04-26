@@ -1,0 +1,17 @@
+{
+    "name": "elephant-php/byte-size",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "ElephantPhp\\ByteSize\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pekhov14",
+            "email": "pehovanton21@gmail.com"
+        }
+    ],
+    "require": {}
+}
