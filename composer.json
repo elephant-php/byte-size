@@ -1,5 +1,15 @@
 {
     "name": "elephant-php/byte-size",
+    "description": "Immutable PHP value object for byte size conversion and formatting.",
+    "keywords": [
+        "php",
+        "bytes",
+        "byte-size",
+        "filesize",
+        "size",
+        "formatter",
+        "value-object"
+    ],
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -13,5 +23,10 @@
             "email": "pehovanton21@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php": "^8.1"
+    },
+    "require-dev": {
+        "testo/testo": "^0.10.2"
+    }
 }
