@@ -40,6 +40,11 @@ final class ByteSize
         return new self($terabytes * self::BYTES_IN_TERABYTE);
     }
 
+    public function toBytes(): float
+    {
+        return $this->byteSize;
+    }
+
     public function toKilobytes(): float
     {
         return $this->byteSize / self::BYTES_IN_KILOBYTE;
@@ -58,11 +63,6 @@ final class ByteSize
     public function toTerabytes(): float
     {
         return $this->byteSize / self::BYTES_IN_TERABYTE;
-    }
-
-    public function toBytes(): float
-    {
-        return $this->byteSize;
     }
 
     public function human(?string $label = null): string
@@ -91,13 +91,10 @@ final class ByteSize
         return $this->human();
     }
 
-    public function format(ByteSizeUnit|string $unit, int $precision = 2, ?string $label = null): string
+    public function format(ByteSizeUnit $unit, int $precision = 2, ?string $label = null): string
     {
-        $normalizedUnit = $unit instanceof ByteSizeUnit
-            ? $unit
-            : ByteSizeUnit::from(strtoupper($unit));
-        $value = match ($normalizedUnit) {
-            ByteSizeUnit::BYTES => $this->toBytes(),
+        $value = match ($unit) {
+            ByteSizeUnit::BYTES     => $this->toBytes(),
             ByteSizeUnit::KILOBYTES => $this->toKilobytes(),
             ByteSizeUnit::MEGABYTES => $this->toMegabytes(),
             ByteSizeUnit::GIGABYTES => $this->toGigabytes(),
@@ -105,7 +102,7 @@ final class ByteSize
         };
 
         $formattedValue = number_format($value, $precision, '.', '');
-        $trimmedValue = $precision > 0
+        $trimmedValue   = $precision > 0
             ? rtrim(rtrim($formattedValue, '0'), '.')
             : $formattedValue;
 
@@ -113,6 +110,6 @@ final class ByteSize
             return $trimmedValue;
         }
 
-        return $trimmedValue . ' ' . ($label ?? $normalizedUnit->value);
+        return $trimmedValue . ' ' . ($label ?? $unit->value);
     }
 }

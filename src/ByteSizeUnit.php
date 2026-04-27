@@ -6,7 +6,7 @@ namespace ElephantPhp\ByteSize;
 
 enum ByteSizeUnit: string
 {
-    case BYTES = 'B';
+    case BYTES     = 'B';
     case KILOBYTES = 'KB';
     case MEGABYTES = 'MB';
     case GIGABYTES = 'GB';
