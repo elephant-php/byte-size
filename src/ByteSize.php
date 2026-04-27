@@ -6,12 +6,6 @@ namespace ElephantPhp\ByteSize;
 
 final class ByteSize
 {
-    private const UNIT_BYTES = 'B';
-    private const UNIT_KILOBYTES = 'KB';
-    private const UNIT_MEGABYTES = 'MB';
-    private const UNIT_GIGABYTES = 'GB';
-    private const UNIT_TERABYTES = 'TB';
-
     private const BYTES_IN_KILOBYTE = 1000;
     private const BYTES_IN_MEGABYTE = 1000_000;
     private const BYTES_IN_GIGABYTE = 1000_000_000;
@@ -71,42 +65,43 @@ final class ByteSize
         return $this->byteSize;
     }
 
-    public function toHuman(): string
+    public function human(?string $label = null): string
     {
         if ($this->byteSize >= self::BYTES_IN_TERABYTE) {
-            return $this->toFormatted(self::UNIT_TERABYTES);
+            return $this->format(ByteSizeUnit::TERABYTES, 2, $label);
         }
 
         if ($this->byteSize >= self::BYTES_IN_GIGABYTE) {
-            return $this->toFormatted(self::UNIT_GIGABYTES);
+            return $this->format(ByteSizeUnit::GIGABYTES, 2, $label);
         }
 
         if ($this->byteSize >= self::BYTES_IN_MEGABYTE) {
-            return $this->toFormatted(self::UNIT_MEGABYTES);
+            return $this->format(ByteSizeUnit::MEGABYTES, 2, $label);
         }
 
         if ($this->byteSize >= self::BYTES_IN_KILOBYTE) {
-            return $this->toFormatted(self::UNIT_KILOBYTES);
+            return $this->format(ByteSizeUnit::KILOBYTES, 2, $label);
         }
 
-        return $this->toFormatted(self::UNIT_BYTES, 0);
+        return $this->format(ByteSizeUnit::BYTES, 0, $label);
     }
 
     public function __toString(): string
     {
-        return $this->toHuman();
+        return $this->human();
     }
 
-    public function toFormatted(string $unit, int $precision = 2): string
+    public function format(ByteSizeUnit|string $unit, int $precision = 2, ?string $label = null): string
     {
-        $normalizedUnit = strtoupper($unit);
+        $normalizedUnit = $unit instanceof ByteSizeUnit
+            ? $unit
+            : ByteSizeUnit::from(strtoupper($unit));
         $value = match ($normalizedUnit) {
-            self::UNIT_BYTES => $this->toBytes(),
-            self::UNIT_KILOBYTES => $this->toKilobytes(),
-            self::UNIT_MEGABYTES => $this->toMegabytes(),
-            self::UNIT_GIGABYTES => $this->toGigabytes(),
-            self::UNIT_TERABYTES => $this->toTerabytes(),
-            default => throw new \InvalidArgumentException('Unsupported unit: ' . $unit),
+            ByteSizeUnit::BYTES => $this->toBytes(),
+            ByteSizeUnit::KILOBYTES => $this->toKilobytes(),
+            ByteSizeUnit::MEGABYTES => $this->toMegabytes(),
+            ByteSizeUnit::GIGABYTES => $this->toGigabytes(),
+            ByteSizeUnit::TERABYTES => $this->toTerabytes(),
         };
 
         $formattedValue = number_format($value, $precision, '.', '');
@@ -114,6 +109,10 @@ final class ByteSize
             ? rtrim(rtrim($formattedValue, '0'), '.')
             : $formattedValue;
 
-        return $trimmedValue . ' ' . $normalizedUnit;
+        if ($label === '') {
+            return $trimmedValue;
+        }
+
+        return $trimmedValue . ' ' . ($label ?? $normalizedUnit->value);
     }
 }
