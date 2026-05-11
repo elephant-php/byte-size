@@ -1,6 +1,6 @@
 {
     "name": "elephant-php/byte-size",
-    "description": "Immutable PHP value object for byte size conversion and formatting.",
+    "description": "ByteSize uses binary conversion (1024-based) for file-size formatting.",
     "keywords": [
         "php",
         "bytes",

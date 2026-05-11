@@ -6,13 +6,17 @@ namespace ElephantPhp\ByteSize;
 
 final class ByteSize
 {
-    private const BYTES_IN_KILOBYTE = 1000;
-    private const BYTES_IN_MEGABYTE = 1000_000;
-    private const BYTES_IN_GIGABYTE = 1000_000_000;
-    private const BYTES_IN_TERABYTE = 1000_000_000_000;
+    private const float BYTES_IN_KILOBYTE = 1024;
+    private const float BYTES_IN_MEGABYTE = 1024 * 1024;
+    private const float BYTES_IN_GIGABYTE = 1024 * 1024 * 1024;
+    private const float BYTES_IN_TERABYTE = 1024 * 1024 * 1024 * 1024;
 
-    private function __construct(private readonly float $byteSize)
-    {
+    private function __construct(
+        private readonly float $bytes,
+    ) {
+        if ($bytes < 0) {
+            throw new \InvalidArgumentException('Byte size cannot be negative.');
+        }
     }
 
     public static function fromBytes(float $bytes): self
@@ -40,50 +44,89 @@ final class ByteSize
         return new self($terabytes * self::BYTES_IN_TERABYTE);
     }
 
+    public static function bytes(int|float $bytes): self
+    {
+        return new self((float) $bytes);
+    }
+
+    public static function kb(int|float $kilobytes): self
+    {
+        return new self((float) $kilobytes * self::BYTES_IN_KILOBYTE);
+    }
+
+    public static function mb(int|float $megabytes): self
+    {
+        return new self((float) $megabytes * self::BYTES_IN_MEGABYTE);
+    }
+
+    public static function gb(int|float $gigabytes): self
+    {
+        return new self((float) $gigabytes * self::BYTES_IN_GIGABYTE);
+    }
+
+    public static function tb(int|float $terabytes): self
+    {
+        return new self((float) $terabytes * self::BYTES_IN_TERABYTE);
+    }
+
     public function toBytes(): float
     {
-        return $this->byteSize;
+        return $this->bytes;
     }
 
     public function toKilobytes(): float
     {
-        return $this->byteSize / self::BYTES_IN_KILOBYTE;
+        return $this->bytes / self::BYTES_IN_KILOBYTE;
     }
 
     public function toMegabytes(): float
     {
-        return $this->byteSize / self::BYTES_IN_MEGABYTE;
+        return $this->bytes / self::BYTES_IN_MEGABYTE;
     }
 
     public function toGigabytes(): float
     {
-        return $this->byteSize / self::BYTES_IN_GIGABYTE;
+        return $this->bytes / self::BYTES_IN_GIGABYTE;
     }
 
     public function toTerabytes(): float
     {
-        return $this->byteSize / self::BYTES_IN_TERABYTE;
+        return $this->bytes / self::BYTES_IN_TERABYTE;
     }
 
-    public function human(?string $label = null): string
+    public function toKb(): float
     {
-        if ($this->byteSize >= self::BYTES_IN_TERABYTE) {
-            return $this->format(ByteSizeUnit::TERABYTES, 2, $label);
-        }
+        return $this->toKilobytes();
+    }
 
-        if ($this->byteSize >= self::BYTES_IN_GIGABYTE) {
-            return $this->format(ByteSizeUnit::GIGABYTES, 2, $label);
-        }
+    public function toMb(): float
+    {
+        return $this->toMegabytes();
+    }
 
-        if ($this->byteSize >= self::BYTES_IN_MEGABYTE) {
-            return $this->format(ByteSizeUnit::MEGABYTES, 2, $label);
-        }
+    public function toGb(): float
+    {
+        return $this->toGigabytes();
+    }
 
-        if ($this->byteSize >= self::BYTES_IN_KILOBYTE) {
-            return $this->format(ByteSizeUnit::KILOBYTES, 2, $label);
-        }
+    public function toTb(): float
+    {
+        return $this->toTerabytes();
+    }
 
-        return $this->format(ByteSizeUnit::BYTES, 0, $label);
+    public function human(int $precision = 2, ?string $label = null): string
+    {
+        $unit = match (true) {
+            $this->bytes >= self::BYTES_IN_TERABYTE => ByteSizeUnit::TERABYTES,
+            $this->bytes >= self::BYTES_IN_GIGABYTE => ByteSizeUnit::GIGABYTES,
+            $this->bytes >= self::BYTES_IN_MEGABYTE => ByteSizeUnit::MEGABYTES,
+            $this->bytes >= self::BYTES_IN_KILOBYTE => ByteSizeUnit::KILOBYTES,
+            default => ByteSizeUnit::BYTES,
+        };
+
+        $precision = $unit === ByteSizeUnit::BYTES ? 0 : $precision;
+
+        return $this->format($unit, $precision, $label);
     }
 
     public function __toString(): string
@@ -102,7 +145,7 @@ final class ByteSize
         };
 
         $formattedValue = number_format($value, $precision, '.', '');
-        $trimmedValue   = $precision > 0
+        $trimmedValue = $precision > 0
             ? rtrim(rtrim($formattedValue, '0'), '.')
             : $formattedValue;
 
