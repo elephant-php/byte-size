@@ -12,64 +12,64 @@ final class ByteSize
     private const float BYTES_IN_TERABYTE = 1024 * 1024 * 1024 * 1024;
 
     private function __construct(
-        private readonly float $bytes,
+        private readonly int $bytes,
     ) {
         if ($bytes < 0) {
             throw new \InvalidArgumentException('Byte size cannot be negative.');
         }
     }
 
-    public static function fromBytes(float $bytes): self
+    public static function fromBytes(int $bytes): self
     {
         return new self($bytes);
     }
 
-    public static function fromKilobytes(float $kilobytes): self
+    public static function fromKilobytes(int|float $kilobytes): self
     {
-        return new self($kilobytes * self::BYTES_IN_KILOBYTE);
+        return new self((int) round($kilobytes * self::BYTES_IN_KILOBYTE));
     }
 
-    public static function fromMegabytes(float $megabytes): self
+    public static function fromMegabytes(int|float $megabytes): self
     {
-        return new self($megabytes * self::BYTES_IN_MEGABYTE);
+        return new self((int) round($megabytes * self::BYTES_IN_MEGABYTE));
     }
 
-    public static function fromGigabytes(float $gigabytes): self
+    public static function fromGigabytes(int|float $gigabytes): self
     {
-        return new self($gigabytes * self::BYTES_IN_GIGABYTE);
+        return new self((int) round($gigabytes * self::BYTES_IN_GIGABYTE));
     }
 
-    public static function fromTerabytes(float $terabytes): self
+    public static function fromTerabytes(int|float $terabytes): self
     {
-        return new self($terabytes * self::BYTES_IN_TERABYTE);
+        return new self((int) round($terabytes * self::BYTES_IN_TERABYTE));
     }
 
-    public static function bytes(int|float $bytes): self
+    public static function bytes(int $bytes): self
     {
-        return new self((float) $bytes);
+        return new self($bytes);
     }
 
     public static function kb(int|float $kilobytes): self
     {
-        return new self((float) $kilobytes * self::BYTES_IN_KILOBYTE);
+        return new self((int) round($kilobytes * self::BYTES_IN_KILOBYTE));
     }
 
     public static function mb(int|float $megabytes): self
     {
-        return new self((float) $megabytes * self::BYTES_IN_MEGABYTE);
+        return new self((int) round($megabytes * self::BYTES_IN_MEGABYTE));
     }
 
     public static function gb(int|float $gigabytes): self
     {
-        return new self((float) $gigabytes * self::BYTES_IN_GIGABYTE);
+        return new self((int) round($gigabytes * self::BYTES_IN_GIGABYTE));
     }
 
     public static function tb(int|float $terabytes): self
     {
-        return new self((float) $terabytes * self::BYTES_IN_TERABYTE);
+        return new self((int) round($terabytes * self::BYTES_IN_TERABYTE));
     }
 
-    public function toBytes(): float
+    public function toBytes(): int
     {
         return $this->bytes;
     }
