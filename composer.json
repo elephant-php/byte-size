@@ -2,7 +2,6 @@
     "name": "elephant-php/byte-size",
     "description": "ByteSize uses binary conversion (1024-based) for file-size formatting.",
     "keywords": [
-        "php",
         "bytes",
         "byte-size",
         "filesize",
