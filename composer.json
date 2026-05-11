@@ -28,5 +28,8 @@
     },
     "require-dev": {
         "testo/testo": "^0.10.2"
+    },
+    "scripts": {
+        "test": "vendor/bin/testo run"
     }
 }

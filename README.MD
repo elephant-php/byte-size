@@ -3,7 +3,7 @@
         <img src="elephant-php.webp" height="256" alt="elephant-php">
     </a>
     <h1 align="center">ByteSize</h1>
-    <p align="center">A small immutable PHP value object for byte-size conversion and formatting.</p>
+    <p align="center">A tiny immutable PHP value object for file size conversion and human-readable formatting.</p>
     <p align="center">
         <a href="https://packagist.org/packages/elephant-php/byte-size"><img src="https://img.shields.io/packagist/v/elephant-php/byte-size.svg" alt="Latest Version"></a>
         <a href="./LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
@@ -12,7 +12,9 @@
     <br>
 </p>
 
-`ByteSize` provides a clean API for converting, formatting, and displaying byte-based values in PHP applications.
+`ByteSize` is a small PHP value object for working with file sizes in a clean and predictable way.
+
+It gives you a simple API to convert raw bytes into higher units, format values for UI or CLI output, and generate readable file-size strings without mixing conversion logic into your application code.
 
 `ByteSize` helps you:
 
@@ -24,16 +26,16 @@
 ## Why ByteSize?
 
 - immutable and predictable value object
-- explicit decimal unit conversion
+- practical file-size conversion based on `1024`
 - clean formatting API with customizable labels
 - useful for file sizes, storage usage, logs, CLI output, and UI rendering
 
-The library uses decimal units:
+The library uses binary file-size units:
 
-- `1 KB = 1000 B`
-- `1 MB = 1000 KB`
-- `1 GB = 1000 MB`
-- `1 TB = 1000 GB`
+- `1 KB = 1024 B`
+- `1 MB = 1024 KB`
+- `1 GB = 1024 MB`
+- `1 TB = 1024 GB`
 
 ## Installation
 
@@ -50,13 +52,13 @@ composer require elephant-php/byte-size
 ```php
 use ElephantPhp\ByteSize\ByteSize;
 
-$size = ByteSize::fromBytes(2_500_000);
+$size = ByteSize::fromBytes(2_621_440);
 
-echo $size->toBytes();      // 2500000
-echo $size->toKilobytes();  // 2500
+echo $size->toBytes();      // 2621440
+echo $size->toKilobytes();  // 2560
 echo $size->toMegabytes();  // 2.5
-echo $size->toGigabytes();  // 0.0025
-echo $size->toTerabytes();  // 0.0000025
+echo $size->toGigabytes();  // 0.00244140625
+echo $size->toTerabytes();  // 0.000002384185791015625
 ```
 
 ## Creation
@@ -64,11 +66,21 @@ echo $size->toTerabytes();  // 0.0000025
 ```php
 use ElephantPhp\ByteSize\ByteSize;
 
-ByteSize::fromBytes(2500000);
-ByteSize::fromKilobytes(2500);
+ByteSize::fromBytes(2621440);
+ByteSize::fromKilobytes(2560);
 ByteSize::fromMegabytes(2.5);
-ByteSize::fromGigabytes(0.0025);
-ByteSize::fromTerabytes(0.0000025);
+ByteSize::fromGigabytes(0.0025);   // 2684354.56 bytes
+ByteSize::fromTerabytes(0.0000025); // 2748779.06944 bytes
+```
+
+Aliases are also available:
+
+```php
+ByteSize::bytes(2621440);
+ByteSize::kb(2560);
+ByteSize::mb(2.5);
+ByteSize::gb(0.0025);
+ByteSize::tb(0.0000025);
 ```
 
 ## Conversion
@@ -76,13 +88,22 @@ ByteSize::fromTerabytes(0.0000025);
 ```php
 use ElephantPhp\ByteSize\ByteSize;
 
-$size = ByteSize::fromBytes(2_500_000);
+$size = ByteSize::fromBytes(2_621_440);
 
-$size->toBytes();      // 2500000
-$size->toKilobytes();  // 2500
+$size->toBytes();      // 2621440
+$size->toKilobytes();  // 2560
 $size->toMegabytes();  // 2.5
-$size->toGigabytes();  // 0.0025
-$size->toTerabytes();  // 0.0000025
+$size->toGigabytes();  // 0.00244140625
+$size->toTerabytes();  // 0.000002384185791015625
+```
+
+Short aliases are also available:
+
+```php
+$size->toKb(); // 2560
+$size->toMb(); // 2.5
+$size->toGb(); // 0.00244140625
+$size->toTb(); // 0.000002384185791015625
 ```
 
 ## Formatting
@@ -93,10 +114,10 @@ Use `format()` when you want an explicit unit.
 use ElephantPhp\ByteSize\ByteSize;
 use ElephantPhp\ByteSize\ByteSizeUnit;
 
-$size = ByteSize::fromBytes(2_500_000);
+$size = ByteSize::fromBytes(2_621_440);
 
-echo $size->format(ByteSizeUnit::TERABYTES, 7);        // 0.0000025 TB
-echo $size->format(ByteSizeUnit::TERABYTES, 7, '');    // 0.0000025
+echo $size->format(ByteSizeUnit::TERABYTES, 7);        // 0.0000024 TB
+echo $size->format(ByteSizeUnit::TERABYTES, 7, '');    // 0.0000024
 echo $size->format(ByteSizeUnit::MEGABYTES, 2);        // 2.5 MB
 echo $size->format(ByteSizeUnit::MEGABYTES, 2, 'МБ');  // 2.5 МБ
 echo $size->format(ByteSizeUnit::MEGABYTES, 2, 'MBs'); // 2.5 MBs
@@ -121,10 +142,10 @@ Use `human()` when you want the library to choose the most suitable unit automat
 ```php
 use ElephantPhp\ByteSize\ByteSize;
 
-$size = ByteSize::fromBytes(2_500_000);
+$size = ByteSize::fromBytes(2_621_440);
 
 echo $size->human();      // 2.5 MB
-echo $size->human('МБ');  // 2.5 МБ
+echo $size->human(2, 'МБ');  // 2.5 МБ
 echo (string) $size;      // 2.5 MB
 ```
 
@@ -132,10 +153,10 @@ Examples of automatic unit switching:
 
 ```php
 ByteSize::fromBytes(999)->human();                // 999 B
-ByteSize::fromBytes(1000)->human();               // 1 KB
-ByteSize::fromBytes(1000000)->human();            // 1 MB
-ByteSize::fromBytes(1000000000)->human();         // 1 GB
-ByteSize::fromBytes(1000000000000)->human();      // 1 TB
+ByteSize::fromBytes(1024)->human();               // 1 KB
+ByteSize::fromBytes(1048576)->human();            // 1 MB
+ByteSize::fromBytes(1073741824)->human();         // 1 GB
+ByteSize::fromBytes(1099511627776)->human();      // 1 TB
 ```
 
 ## Available units
@@ -148,12 +169,6 @@ ByteSizeUnit::KILOBYTES;
 ByteSizeUnit::MEGABYTES;
 ByteSizeUnit::GIGABYTES;
 ByteSizeUnit::TERABYTES;
-```
-
-## Testing
-
-```bash
-vendor/bin/testo run
 ```
 
 ## License
