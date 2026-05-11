@@ -6,8 +6,9 @@
         "bytes",
         "byte-size",
         "filesize",
-        "size",
+        "file-size",
         "formatter",
+        "conversion",
         "value-object"
     ],
     "type": "library",
